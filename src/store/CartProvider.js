@@ -25,7 +25,7 @@ const cartReducer = (state, action) => {
     const addItemToCartHandler = item => {
         dispatchCartAction({
             type: 'ADD_CART_ITEM',
-            dispatch: item
+            payload: item
         })
     }
     const removeItemFromCartHandler = id => {
