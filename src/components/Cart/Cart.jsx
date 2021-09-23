@@ -7,7 +7,7 @@ import CartItem from "./CartItem";
 export const Cart = ({ showCartHandler }) => {
   const cartCtx = useContext(CartContext);
 
-  const totalAmount =`$${cartCtx.cartContext.totalAmount.toFixed(2)}`;
+  const totalAmount = `$${cartCtx.cartContext.totalAmount.toFixed(2)}`;
   const hashItems = cartCtx.cartContext.items.length > 0;
 
   const cartItemAddHandler = (item) => {
