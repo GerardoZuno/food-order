@@ -7,12 +7,10 @@ const defaultCartState = {
 }
 
 const cartReducer = (state, action) => {
-    if(action.type === 'ADD_CART_ITEM'){
-       
+    if(action.type === 'ADD_CART_ITEM'){       
        const existingCartItemsIndex = state.items.findIndex(item => item.id === action.payload.id)
        const existingCartItem = state.items[existingCartItemsIndex] 
        let updatedItems;
-
        if(existingCartItem){
          const updatedItem = {
                ...existingCartItem,
@@ -26,12 +24,42 @@ const cartReducer = (state, action) => {
        }
       
 
-       const updatedTotalAmount = state.totalAmount + action.payload.price * action.payload.amount 
+       const updatedTotalAmount = state.totalAmount + action.payload.price * action.payload.amount
+
+
+       
+       
        return {
            items: updatedItems,
            totalAmount: updatedTotalAmount,
        } 
     }
+
+    if(action.type === 'REMOVE_CART_ITEM'){
+
+        
+        const existingCartItemIndex = state.items.findIndex(item => item.id === action.payload)
+        const existingItem =  state.items[existingCartItemIndex]
+        console.log(existingItem)
+        const updateTotalAmount = state.totalAmount - existingItem.price
+        const updatedTotalAmount = updateTotalAmount.toFixed(2)
+        let updatedItems;
+        if(existingItem.amount === 1){
+           updatedItems = state.items.filter((item) => item.id !== action.payload)
+        }else {
+          const updatedItem = {...existingItem, amount: existingItem.amount -1} 
+          updatedItems = [...state.items]
+          updatedItems[existingCartItemIndex] = updatedItem
+
+        }
+
+        return {
+            items: updatedItems,
+            totalAmount: updatedTotalAmount
+        }
+    }
+
+
     
        return  defaultCartState
 }
@@ -49,9 +77,11 @@ const cartReducer = (state, action) => {
     const removeItemFromCartHandler = id => {
         dispatchCartAction({
             type: 'REMOVE_CART_ITEM',
-            dispatch: id
+            payload: id
         })
     }
+
+
 
    const cartContext = {
        items: cartState.items,
