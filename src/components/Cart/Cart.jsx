@@ -1,33 +1,47 @@
-import React from 'react'
-import Modal from '../UI/Modal'
-import classes from './Cart.module.css'
+import React, { useContext } from "react";
+import CartContext from "../../store/Cart-context";
+import Modal from "../UI/Modal";
+import classes from "./Cart.module.css";
+import CartItem from "./CartItem";
 
-export const Cart = ({showCartHandler}) => {
+export const Cart = ({ showCartHandler }) => {
+  const cartCtx = useContext(CartContext);
 
-    const cartItems = <ul className={classes['cart-items']}>{[
-        {id: '1', name: 'sushi', amount: 2, price: 12.99}
-    ].map(item =>  <li>{item.name}</li>)} </ul>
-    
+  const totalAmount = cartCtx.cartContext.totalAmount;
+  const hashItems = cartCtx.cartContext.items.length > 0;
 
-    return (
-        <Modal showCartHandler={showCartHandler}>
-            {cartItems}
-            <div className={classes.total}>
-               <span>Total Amount</span>
-               <span>35.78</span>
+  const cartItemAddHandler = (item) => {};
 
-            </div>
-            <div className={classes.actions}>
-                <button
-                 className={classes['button--alt']}
-                 onClick={showCartHandler}
-                 >
-                     Close
-                 </button>
-                <button className={classes.button}>Order</button>
+  const cartItemRemoveHandler = (id) => {};
 
-            </div>
-            
-        </Modal>
-    )
-}
+  const cartItems = (
+    <ul className={classes["cart-items"]}>
+      {cartCtx.cartContext.items.map((item) => (
+        <CartItem
+          key={item.id}
+          name={item.name}
+          amount={item.amount}
+          price={item.price}
+          cartItemAddHandler={cartItemAddHandler.bind(null, item)}
+          cartItemRemoveHandler={cartItemRemoveHandler.bind(null, item.id)}
+        />
+      ))}
+    </ul>
+  );
+
+  return (
+    <Modal showCartHandler={showCartHandler}>
+      {cartItems}
+      <div className={classes.total}>
+        <span>Total Amount</span>
+        <span>{totalAmount}</span>
+      </div>
+      <div className={classes.actions}>
+        <button className={classes["button--alt"]} onClick={showCartHandler}>
+          Close
+        </button>
+        {hashItems && <button className={classes.button}>Order</button>}
+      </div>
+    </Modal>
+  );
+};
