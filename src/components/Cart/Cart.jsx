@@ -7,6 +7,10 @@ import Checkout from "./Checkout";
 
 export const Cart = ({ showCartHandler }) => {
   const [isCheckout, setIsCheckout] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [didSubmit, setDidSubmit] = useState(false)
+
+
   const cartCtx = useContext(CartContext);
 
   const totalAmount = `$${cartCtx.cartContext.totalAmount.toFixed(2)}`;
@@ -25,14 +29,19 @@ export const Cart = ({ showCartHandler }) => {
      setIsCheckout(true)
   }
 
-  const submitOrderHandler = (userData) => {
-        fetch('https://food-order-app-29fae-default-rtdb.firebaseio.com/orders.json', {
+  const submitOrderHandler = async (userData) => {
+        setIsSubmitting(true)
+        await fetch('https://food-order-app-29fae-default-rtdb.firebaseio.com/orders.json', {
           method: 'POST',
           body: JSON.stringify({
             user: userData,
             orderedItems: cartCtx.cartContext.items
           })
         })
+        setIsSubmitting(false)
+        setDidSubmit(true)
+        cartCtx.cartContext.clearCart()
+
   }
 
 
@@ -70,19 +79,40 @@ export const Cart = ({ showCartHandler }) => {
       </div>
   )
 
-  return (
-    <Modal showCartHandler={showCartHandler}>
-      {cartItems}
-      <div className={classes.total}>
-        <span>Total Amount</span>
-        <span>{totalAmount}</span>
+  const cartModalContent =  
+  <>
+  {cartItems}
+  <div className={classes.total}>
+    <span>Total Amount</span>
+    <span>{totalAmount}</span>
+  </div>
+  { isCheckout && <Checkout submitOrderHandler={submitOrderHandler} showCartHandler={showCartHandler}/> }
+  { !isCheckout && modalActions }
+  </> 
+
+  const isSubmittingModalContent = <p>Sending order data...</p>
+
+  const didSubmitModalContent =
+   <>
+   <p>Succesfully sent  the order!</p>
+   <div className={classes.actions}>
+        <button 
+        className={classes.button}
+         onClick={showCartHandler}
+         >
+          Close
+        </button>
+     
       </div>
-      { isCheckout && <Checkout submitOrderHandler={submitOrderHandler} showCartHandler={showCartHandler}/> }
-      { !isCheckout && modalActions }
 
+   </>
 
-      
-      
+  return (
+    <Modal showCartHandler={showCartHandler}>     
+     {!isSubmitting  && !didSubmit &&  cartModalContent}
+     { isSubmitting && isSubmittingModalContent}
+     {!isSubmitting && didSubmit && didSubmitModalContent}       
+        
     </Modal>
   );
 };
