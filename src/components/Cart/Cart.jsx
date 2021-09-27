@@ -25,6 +25,18 @@ export const Cart = ({ showCartHandler }) => {
      setIsCheckout(true)
   }
 
+  const submitOrderHandler = (userData) => {
+        fetch('https://food-order-app-29fae-default-rtdb.firebaseio.com/orders.json', {
+          method: 'POST',
+          body: JSON.stringify({
+            user: userData,
+            orderedItems: cartCtx.cartContext.items
+          })
+        })
+  }
+
+
+
   const cartItems = (
     <ul className={classes["cart-items"]}>
       {cartCtx.cartContext.items.map((item) => (
@@ -65,7 +77,7 @@ export const Cart = ({ showCartHandler }) => {
         <span>Total Amount</span>
         <span>{totalAmount}</span>
       </div>
-      { isCheckout && <Checkout showCartHandler={showCartHandler}/> }
+      { isCheckout && <Checkout submitOrderHandler={submitOrderHandler} showCartHandler={showCartHandler}/> }
       { !isCheckout && modalActions }
 
 

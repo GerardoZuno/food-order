@@ -1,40 +1,110 @@
-import React from 'react'
-import classes from './Checkout.module.css'
+import React, { useRef, useState } from "react";
+import classes from "./Checkout.module.css";
 
-const Checkout = ({showCartHandler}) => {
+const isEmpty = (value) => {
+  return !value.trim();
+};
 
 
-    const confirmHandler = (e) => {
-        e.preventDefault();
+
+const Checkout = ({ showCartHandler, submitOrderHandler }) => {
+
+  const [formInputsValidity, setFormInputsValidity] = useState({
+        name: true,
+        street: true,
+        city: true,
+        postalCode: true,
+
+  })  
+
+  const nameInputRef = useRef();
+  const streetInputRef = useRef();
+  const postalCodeInputRef = useRef();
+  const cityInputRef = useRef();
+
+  const confirmHandler = (e) => {
+    e.preventDefault();
+
+    const enteredName = nameInputRef.current.value;
+    const enteredStreet = streetInputRef.current.value;
+    const enteredPostalCode = postalCodeInputRef.current.value;
+    const enteredCity = cityInputRef.current.value;
+
+    const enteredNameIsValid = !isEmpty(enteredName)
+    const enteredStreetIsValid = !isEmpty(enteredStreet)
+    const enteredPostalCodeIsValid = !isEmpty(enteredPostalCode)
+    const enteredCityIsValid = !isEmpty(enteredCity)
+
+    setFormInputsValidity({
+        name: enteredNameIsValid,
+        street: enteredStreetIsValid,
+        city: enteredCityIsValid,
+        postalCode: enteredPostalCodeIsValid,
+    })
+
+    const formIsValid = 
+    enteredNameIsValid &&
+     enteredStreetIsValid && 
+     enteredCityIsValid && 
+     enteredPostalCodeIsValid
+     
+
+    if(!formIsValid){
+       return
     }
-    return (
-        <form onSubmit={confirmHandler}>
-            <div className={classes.control}>
-            <label htmlFor="name">Your Name</label>            
-            <input type="text" id="name"/>
-            </div>
-            <div className={classes.control}>
-            <label htmlFor="street">Street</label>            
-            <input type="text" id="street"/>
-            </div>
-            <div className={classes.control}>
-            <label htmlFor="postal">Postal Code</label>            
-            <input type="text" id="postal"/>
-            </div>
-            <div className={classes.control}>
-            <label htmlFor="city">City</label>            
-            <input type="text" id="city"/>
-             <button>
-                 Confirm
-             </button>
-             <button onClick={showCartHandler}>
-                 Cancel
-             </button>
-            </div>
 
-        </form>
-        
-    )
-}
+    submitOrderHandler({
+        name: enteredName,
+        street: enteredStreet,
+        postalCode: enteredPostalCode,
+        city: enteredCity,
+    })
 
-export default Checkout
+  };
+
+ 
+
+  return (
+    <form className={classes.form} onSubmit={confirmHandler}>
+      <div className={`${classes.control} 
+      ${formInputsValidity.name ? '' : classes.invalid}`}>
+        <label htmlFor="name">Your Name</label>
+        <input 
+        type="text"
+         id="name"
+          ref={nameInputRef} 
+         />
+        {!formInputsValidity.name && <p>Please enter a valid name!</p> }
+      </div>
+      <div className={`${classes.control} 
+      ${formInputsValidity.street ? '' : classes.invalid}`}>
+        <label htmlFor="street">Street</label>
+        <input type="text" id="street" ref={streetInputRef} />
+        {!formInputsValidity.street && <p>Please enter a valid street!</p> }
+
+      </div>
+      <div className={`${classes.control} 
+      ${formInputsValidity.postalCode ? '' : classes.invalid}`}>
+        <label htmlFor="postalCode">Postal Code</label>
+        <input type="text" id="postalCode" ref={postalCodeInputRef} />
+        {!formInputsValidity.postalCode && <p>Please enter a valid postal code!</p> }
+
+      </div>
+      <div className={`${classes.control} 
+      ${formInputsValidity.city ? '' : classes.invalid}`}>
+        <label htmlFor="city">City</label>
+        <input type="text" id="city" ref={cityInputRef} />
+        {!formInputsValidity.city && <p>Please enter a valid city!</p> }
+
+
+        <div className={classes.actions}>
+          <button className={classes.submit}>Confirm</button>
+
+          <button onClick={showCartHandler}>Cancel</button>
+        </div>
+      </div>
+    </form>
+  );
+};
+
+export default Checkout;
